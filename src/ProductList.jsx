@@ -6,7 +6,7 @@ function ProductList({ onHomeClick }) {
     const [showCart, setShowCart] = useState(false);
     const [showPlants, setShowPlants] = useState(false); // State to control the visibility of the About Us page
 
-    const [addedToCart, setAddedToCart] = useState([]); // State to store disabled products
+    const [addedToCart, setAddedToCart] = useState({});
 
     const plantsArray = [
         {
@@ -256,9 +256,12 @@ function ProductList({ onHomeClick }) {
         setShowCart(false);
     };
 
-    const handleAddToCart = plant => {
-        dispatch(addItem(plant));
-        setAddedToCart([...addedToCart, plant.name]); // Mark the product as disabled
+    const handleAddToCart = (product) => {
+        dispatch(addItem(product));
+        setAddedToCart((prevState) => ({
+            ...prevState,
+            [product.name]: true, // Set the product name as key and value as true to indicate it's added to cart
+        }));
     };
     return (
         <div>
@@ -282,26 +285,20 @@ function ProductList({ onHomeClick }) {
             </div>
             {!showCart ? (
                 <div className="product-grid">
-                    {plantsArray.map(plantcat => (                        
+                    {plantsArray.map((category, index) => (
+                    <div key={index}>
+                        <h1><div>{category.category}</div></h1>
                         <div className="product-list">
-                            <h2>{plantcat.category}</h2>
-                            {plantcat.plants.map(plant => (
-                                <div className="product-card">
-                                    <p className="product-title">{plant.name}</p>
-                                    <p className="product-price">{plant.cost}</p>
-                                    <p>{plant.description}<br/>
-                                    <img className="product-image" src={plant.image}/></p>
-                                    <button classname="product-button"
-                                    
-                                    onClick={() => handleAddToCart(product)}
-                                    
-                                    >
-                                    Add to Cart
-                                    </button>  
-                                </div>                                                     
-                            )) }
+                            {category.plants.map((plant, plantIndex) => (
+                            <div className="product-card" key={plantIndex}>
+                                <img className="product-image" src={plant.image} alt={plant.name} />
+                                <div className="product-title">{plant.name}</div>
+                                {/*Similarly like the above plant.name show other details like description and cost*/}
+                                <button  className="product-button" onClick={() => handleAddToCart(plant)}>Add to Cart</button>
+                            </div>
+                            ))}
                         </div>
-                        
+                    </div>
                     ))}
                 </div>
             ) : (
